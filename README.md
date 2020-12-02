@@ -1,8 +1,10 @@
-[![Platform](https://img.shields.io/badge/platform-android-green.svg)](https://developer.android.google.cn) [![Licence](https://img.shields.io/badge/Licence-Apache2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0) [![API](https://img.shields.io/badge/API-16%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=19) [![jitpack](https://jitpack.io/v/zaaach/AudioPlayerHelper.svg)](https://jitpack.io/#zaaach/AudioPlayerHelper)
+[![Platform](https://img.shields.io/badge/platform-android-green.svg)](https://developer.android.google.cn) [![Licence](https://img.shields.io/badge/Licence-Apache2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0) [![API](https://img.shields.io/badge/API-19%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=19) [![jitpack](https://jitpack.io/v/zaaach/AudioPlayerHelper.svg)](https://jitpack.io/#zaaach/AudioPlayerHelper)
 
 # AudioPlayerHelper
 
-> 音频播放器简单封装了一下，一行代码就能播！
+> 基于`MediaPlayer`的音频播放器简单封装了一下，一行代码就能播！
+>
+> 还可以关联`SeekBar`，不用再处理拖动事件了，只需要在进度回调里更新就行:smile:
 
 # Preview
 ![gif]()
@@ -34,10 +36,73 @@ dependencies {
 
 1、播放
 
-```groovy
-new AudioPlayerHelper(context)
+```java
+playerHelper = new AudioPlayerHelper(context)
+	.attachSeekBar(seekBar)//关联SeekBar
+    .setLooping(true)
     .setDebug(true)
-    .playOrPause();
+	.setOnAudioPlayStateChangeListener(this)//播放器回调
+    .setDataSource("http://....");
+playerHelper.playOrPause();
+```
+
+2、播放器回调
+
+```java
+@Override
+public void onPreparing(MediaPlayer player) {
+    
+}
+
+@Override
+public void onPrepared(MediaPlayer player, long duration) {
+}
+
+@Override
+public void onPlaying(MediaPlayer player) {
+}
+
+@Override
+public void onProgress(MediaPlayer player, @Nullable SeekBar seekBar, boolean isDragging, long position, long duration) {
+}
+
+@Override
+public void onPlayPaused(MediaPlayer player) {
+}
+
+@Override
+public void onPlayStop(MediaPlayer player) {
+}
+
+@Override
+public void onPlayComplete(MediaPlayer player) {
+}
+
+@Override
+public void onPlayError(String msg) {
+}
+```
+
+3、生命周期
+
+```java
+@Override
+protected void onPause() {
+    super.onPause();
+    playerHelper.pause();//暂停
+}
+
+@Override
+protected void onResume() {
+    super.onResume();
+    playerHelper.restore();//恢复播放
+}
+
+@Override
+protected void onDestroy() {
+    super.onDestroy();
+    playerHelper.destroy();//释放资源
+}
 ```
 
 :wink:Good luck！！！

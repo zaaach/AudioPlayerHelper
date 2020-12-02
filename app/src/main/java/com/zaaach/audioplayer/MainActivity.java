@@ -1,7 +1,9 @@
 package com.zaaach.audioplayer;
 
+import android.annotation.SuppressLint;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -15,9 +17,9 @@ import com.zaaach.audioplayerhelper.OnAudioPlayStateChangeListener;
 
 import java.util.Locale;
 
+@SuppressLint("SetTextI18n")
 public class MainActivity extends AppCompatActivity implements OnAudioPlayStateChangeListener {
     private static final String MUSIC_URL = "http://music.163.com/song/media/outer/url?id=574633384.mp3";
-    private static final String MUSIC_URL_2 = "http://music.163.com/song/media/outer/url?id=1498342485.mp3";
 
     private AudioPlayerHelper playerHelper;
     private Button playBtn;
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements OnAudioPlayStateC
                 .attachSeekBar(seekBar)
                 .setLooping(true)
                 .setDebug(true)
-                .setDataSource(MUSIC_URL_2)
+                .setDataSource(MUSIC_URL)
                 .setOnAudioPlayStateChangeListener(this);
     }
 
@@ -72,8 +74,9 @@ public class MainActivity extends AppCompatActivity implements OnAudioPlayStateC
         playerHelper.destroy();
     }
 
-    public String formatSeconds(long seconds){
+    public String formatTime(long mills){
         String standardTime;
+        long seconds = mills / 1000;
         if (seconds <= 0){
             standardTime = "00:00";
         } else if (seconds < 60) {
@@ -96,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements OnAudioPlayStateC
     @Override
     public void onPrepared(MediaPlayer player, long duration) {
         seekBar.setMax((int) duration);
-        tvTimer.setText("00:00 / " + formatSeconds(duration/1000));
+        tvTimer.setText("00:00 / " + formatTime(duration));
     }
 
     @Override
@@ -109,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements OnAudioPlayStateC
         if (seekBar != null && !isDragging) {
             seekBar.setProgress((int) position);
         }
+        tvTimer.setText(formatTime(position) + " / " + formatTime(duration));
     }
 
     @Override
@@ -119,15 +123,19 @@ public class MainActivity extends AppCompatActivity implements OnAudioPlayStateC
     @Override
     public void onPlayStop(MediaPlayer player) {
         playBtn.setText("播放");
+        seekBar.setProgress(0);
+        tvTimer.setText("00:00 / " + formatTime(player.getDuration()));
     }
 
     @Override
     public void onPlayComplete(MediaPlayer player) {
-
+        Log.e("Audio", "onPlayComplete");
     }
 
     @Override
     public void onPlayError(String msg) {
-
+        Log.e("Audio", msg);
+        seekBar.setProgress(0);
+        tvTimer.setText("00:00 / 00:00");
     }
 }
