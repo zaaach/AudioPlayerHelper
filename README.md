@@ -2,12 +2,12 @@
 
 # AudioPlayerHelper
 
-> 基于`MediaPlayer`的音频播放器简单封装了一下，一行代码就能播！
+> 基于`MediaPlayer`的音频播放器简单封装了一下，内部已处理音频焦点，一行代码就能播！
 >
-> 还可以关联`SeekBar`，不用再处理拖动事件了，只需要在进度回调里更新就行:smile:
+> 还可以关联`SeekBar`，不用再处理拖动事件啦，只需要在进度回调里更新就行:smile:
 
 # Preview
-![gif]()
+![gif](https://raw.githubusercontent.com/zaaach/AudioPlayerHelper/master/arts/audio_player.gif)
 
 # Install
 
@@ -38,20 +38,19 @@ dependencies {
 
 ```java
 playerHelper = new AudioPlayerHelper(context)
-	.attachSeekBar(seekBar)//关联SeekBar
+    .attachSeekBar(seekBar)//关联SeekBar
     .setLooping(true)
     .setDebug(true)
-	.setOnAudioPlayStateChangeListener(this)//播放器回调
-    .setDataSource("http://....");
-playerHelper.playOrPause();
+    .setOnAudioPlayStateChangeListener(this)//播放器回调
+    .setDataSource("http://....")
+    .playOrPause();
 ```
 
 2、播放器回调
 
 ```java
 @Override
-public void onPreparing(MediaPlayer player) {
-    
+public void onPreparing(MediaPlayer player) {  
 }
 
 @Override
