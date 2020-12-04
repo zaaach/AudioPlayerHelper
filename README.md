@@ -40,10 +40,13 @@ dependencies {
 playerHelper = new AudioPlayerHelper(context)
     .attachSeekBar(seekBar)//关联SeekBar
     .setLooping(true)
+    .setInterval(500)//进度更新的间隔时间
     .setDebug(true)
     .setOnAudioPlayStateChangeListener(this)//播放器回调
     .setDataSource("http://....")
     .playOrPause();
+//切换音乐
+playerHelper.play("http://....");
 ```
 
 2、播放器回调
@@ -54,7 +57,7 @@ public void onPreparing(MediaPlayer player) {
 }
 
 @Override
-public void onPrepared(MediaPlayer player, long duration) {
+public void onPrepared(MediaPlayer player, int duration) {
 }
 
 @Override
@@ -62,7 +65,7 @@ public void onPlaying(MediaPlayer player) {
 }
 
 @Override
-public void onProgress(MediaPlayer player, @Nullable SeekBar seekBar, boolean isDragging, long position, long duration) {
+public void onProgress(MediaPlayer player, @Nullable SeekBar seekBar, boolean isDragging, int progress, int duration) {
 }
 
 @Override
@@ -121,7 +124,7 @@ protected void onDestroy() {
 # License
 
 ```
-Copyright (c) 2019 zaaach
+Copyright (c) 2020 zaaach
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

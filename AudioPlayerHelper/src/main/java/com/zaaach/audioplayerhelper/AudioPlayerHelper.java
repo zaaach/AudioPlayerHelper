@@ -257,7 +257,7 @@ public class AudioPlayerHelper implements IAudioPlayer, MediaPlayer.OnPreparedLi
     public void play(String path) {
         //如果已处于播放，先停止再重新播放
         if (mediaPlayer != null && !isIdle()){
-            mediaPlayer.stop();
+            stop();
         }
         doPlay(path);
     }
@@ -325,6 +325,7 @@ public class AudioPlayerHelper implements IAudioPlayer, MediaPlayer.OnPreparedLi
     @Override
     public void stop() {
         abandonAudioFocus();
+        mHandler.removeCallbacks(timerRunnable);
         if (isIdle()) return;
         ALog.d(TAG, "======================stop()");
         if (mediaPlayer != null) {

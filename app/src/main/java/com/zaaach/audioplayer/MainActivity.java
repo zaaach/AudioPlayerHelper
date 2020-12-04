@@ -154,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements OnAudioPlayStateC
     @Override
     public void onPlayComplete(MediaPlayer player) {
         Log.e("Audio", "onPlayComplete");
+        tvTimer.setText("00:00 / " + formatTime(player.getDuration()));
         count += 1;
         playerHelper.play(MUSIC_URLS[count % 2]);
         viewFlipper.showNext();
