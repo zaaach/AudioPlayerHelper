@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements OnAudioPlayStateC
 
         playerHelper = new AudioPlayerHelper(this)
                 .attachSeekBar(seekBar)
-                .setLooping(true)
+                .setLooping(false)
                 .setInterval(500)
                 .setDebug(true)
                 .setDataSource(MUSIC_URLS[0])
@@ -154,6 +154,9 @@ public class MainActivity extends AppCompatActivity implements OnAudioPlayStateC
     @Override
     public void onPlayComplete(MediaPlayer player) {
         Log.e("Audio", "onPlayComplete");
+        count += 1;
+        playerHelper.play(MUSIC_URLS[count % 2]);
+        viewFlipper.showNext();
     }
 
     @Override
