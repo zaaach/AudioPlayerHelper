@@ -13,9 +13,9 @@ import androidx.annotation.Nullable;
  */
 public interface OnAudioPlayStateChangeListener {
     void onPreparing(MediaPlayer player);
-    void onPrepared(MediaPlayer player, long duration);
+    void onPrepared(MediaPlayer player, int duration);
     void onPlaying(MediaPlayer player);
-    void onProgress(MediaPlayer player, @Nullable SeekBar seekBar, boolean isDragging, long position, long duration);
+    void onProgress(MediaPlayer player, @Nullable SeekBar seekBar, boolean isDragging, int progress, int duration);
     void onPlayPaused(MediaPlayer player);
     void onPlayStop(MediaPlayer player);
     void onPlayComplete(MediaPlayer player);

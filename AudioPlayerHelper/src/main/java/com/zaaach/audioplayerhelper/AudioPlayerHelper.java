@@ -40,9 +40,9 @@ public class AudioPlayerHelper implements IAudioPlayer, MediaPlayer.OnPreparedLi
     private SeekBar mSeekBar;
 
     private String audioPath;
-    private long duration;
     private boolean isDragging;//是否正在拖动seekbar
     private boolean looping;
+    private int interval = PROGRESS_INTERVAL;//进度更新间隔时间
 
     /**
      * 初始化
@@ -80,6 +80,11 @@ public class AudioPlayerHelper implements IAudioPlayer, MediaPlayer.OnPreparedLi
 
     public AudioPlayerHelper setLooping(boolean looping){
         this.looping = looping;
+        return this;
+    }
+
+    public AudioPlayerHelper setInterval(int millis){
+        this.interval = millis;
         return this;
     }
 
@@ -124,15 +129,15 @@ public class AudioPlayerHelper implements IAudioPlayer, MediaPlayer.OnPreparedLi
                 if (onAudioPlayStateChangeListener != null){
                     onAudioPlayStateChangeListener.onProgress(mediaPlayer, mSeekBar, isDragging, mediaPlayer.getCurrentPosition(), mediaPlayer.getDuration());
                 }
+                mHandler.postDelayed(timerRunnable, interval);
             }
-            mHandler.postDelayed(timerRunnable, PROGRESS_INTERVAL);
         }
     };
 
     @Override
     public void onPrepared(MediaPlayer mp) {
         ALog.d(TAG, "======================onPrepared()");
-        duration = mp.getDuration();
+        int duration = mp.getDuration();
         state = STATE_PREPARED;
         if (onAudioPlayStateChangeListener != null){
             onAudioPlayStateChangeListener.onPrepared(mp, duration);
@@ -141,11 +146,12 @@ public class AudioPlayerHelper implements IAudioPlayer, MediaPlayer.OnPreparedLi
     }
 
     private void startPlayer(){
+        if (mediaPlayer == null) return;
         if (isPlaying()) return;
         ALog.d(TAG, "======================startPlayer()");
         mediaPlayer.start();
         state = STATE_PLAYING;
-        mHandler.post(timerRunnable);
+        mHandler.postDelayed(timerRunnable, interval);
         if (onAudioPlayStateChangeListener != null) {
             onAudioPlayStateChangeListener.onPlaying(mediaPlayer);
         }
@@ -192,6 +198,7 @@ public class AudioPlayerHelper implements IAudioPlayer, MediaPlayer.OnPreparedLi
         if (mSeekBar != null && !mediaPlayer.isLooping()){
             mSeekBar.setProgress(0);
         }
+        mHandler.removeCallbacks(timerRunnable);
         if (mediaPlayer.isLooping()){
             startPlayer();
         }
@@ -246,9 +253,23 @@ public class AudioPlayerHelper implements IAudioPlayer, MediaPlayer.OnPreparedLi
         }
     }
 
+    @Override
+    public void play(String path) {
+        //如果已处于播放，先停止再重新播放
+        if (mediaPlayer != null && !isIdle()){
+            mediaPlayer.stop();
+        }
+        doPlay(path);
+    }
+
     private void doPlay(){
+        doPlay(audioPath);
+    }
+
+    private void doPlay(String path){
+        this.audioPath = path;
         if (TextUtils.isEmpty(audioPath)) {
-            throw new RuntimeException("======================audioPath must not be null");
+            throw new RuntimeException(TAG + "======================audio path must not be null");
         }
         try {
             if (mediaPlayer == null){
@@ -303,13 +324,13 @@ public class AudioPlayerHelper implements IAudioPlayer, MediaPlayer.OnPreparedLi
 
     @Override
     public void stop() {
+        abandonAudioFocus();
         if (isIdle()) return;
         ALog.d(TAG, "======================stop()");
         if (mediaPlayer != null) {
             mediaPlayer.stop();
         }
         state = STATE_IDLE;
-        abandonAudioFocus();
         if (onAudioPlayStateChangeListener != null){
             onAudioPlayStateChangeListener.onPlayStop(mediaPlayer);
         }

@@ -14,6 +14,11 @@ public interface IAudioPlayer {
     boolean isPaused();
 
     /**
+     * 播放指定音频地址
+     */
+    void play(String path);
+
+    /**
      * 播放or暂停播放，需要先设置音频地址
      */
     void playOrPause();

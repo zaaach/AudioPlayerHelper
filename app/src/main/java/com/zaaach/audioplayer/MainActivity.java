@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,12 +21,18 @@ import java.util.Locale;
 
 @SuppressLint("SetTextI18n")
 public class MainActivity extends AppCompatActivity implements OnAudioPlayStateChangeListener {
-    private static final String MUSIC_URL = "http://music.163.com/song/media/outer/url?id=574633384.mp3";
+    private String[] MUSIC_URLS = {
+            "http://music.163.com/song/media/outer/url?id=574633384.mp3",
+            "http://music.163.com/song/media/outer/url?id=1498342485.mp3"
+    };
+    private int[] IMG_IDS = {R.mipmap.kenengfou, R.mipmap.haojin};
 
     private AudioPlayerHelper playerHelper;
     private Button playBtn;
     private SeekBar seekBar;
     private TextView tvTimer;
+    private ViewFlipper viewFlipper;
+    private int count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +42,13 @@ public class MainActivity extends AppCompatActivity implements OnAudioPlayStateC
         tvTimer = findViewById(R.id.tv_timer);
         seekBar = findViewById(R.id.seek_bar);
         playBtn = findViewById(R.id.btn_play_or_pause);
+        viewFlipper = findViewById(R.id.view_flipper);
+
+        for (int i = 0; i < IMG_IDS.length; i++) {
+            ImageView iv = new ImageView(this);
+            iv.setImageResource(IMG_IDS[i]);
+            viewFlipper.addView(iv);
+        }
 
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,12 +62,21 @@ public class MainActivity extends AppCompatActivity implements OnAudioPlayStateC
                 playerHelper.stop();
             }
         });
+        findViewById(R.id.btn_play_next).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                count += 1;
+                playerHelper.play(MUSIC_URLS[count % 2]);
+                viewFlipper.showNext();
+            }
+        });
 
         playerHelper = new AudioPlayerHelper(this)
                 .attachSeekBar(seekBar)
                 .setLooping(true)
+                .setInterval(500)
                 .setDebug(true)
-                .setDataSource(MUSIC_URL)
+                .setDataSource(MUSIC_URLS[0])
                 .setOnAudioPlayStateChangeListener(this);
     }
 
@@ -97,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements OnAudioPlayStateC
     }
 
     @Override
-    public void onPrepared(MediaPlayer player, long duration) {
+    public void onPrepared(MediaPlayer player, int duration) {
         seekBar.setMax((int) duration);
         tvTimer.setText("00:00 / " + formatTime(duration));
     }
@@ -108,11 +132,11 @@ public class MainActivity extends AppCompatActivity implements OnAudioPlayStateC
     }
 
     @Override
-    public void onProgress(MediaPlayer player, @Nullable SeekBar seekBar, boolean isDragging, long position, long duration) {
+    public void onProgress(MediaPlayer player, @Nullable SeekBar seekBar, boolean isDragging, int progress, int duration) {
         if (seekBar != null && !isDragging) {
-            seekBar.setProgress((int) position);
+            seekBar.setProgress(progress);
         }
-        tvTimer.setText(formatTime(position) + " / " + formatTime(duration));
+        tvTimer.setText(formatTime(progress) + " / " + formatTime(duration));
     }
 
     @Override

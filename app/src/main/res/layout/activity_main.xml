@@ -7,6 +7,18 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <ViewFlipper
+        android:id="@+id/view_flipper"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:inAnimation="@anim/push_right_in"
+        android:outAnimation="@anim/push_left_out"
+        android:autoStart="false"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="32dp"/>
+
     <TextView
         android:id="@+id/tv_timer"
         android:layout_width="wrap_content"
@@ -25,6 +37,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="播放"/>
+
+    <Button
+        android:id="@+id/btn_play_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="切换"/>
 
     <Button
         android:id="@+id/btn_stop"
